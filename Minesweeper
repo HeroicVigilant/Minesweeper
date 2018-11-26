@@ -1,2 +1,64 @@
+#include "pch.h"
+#include <array>
+#include <iostream>
+#include <iomanip>
+#include <time.h>
+using namespace std;
 
-#include pch.h
+void mineSweeper();
+void theIntro();
+
+int main()
+{
+	theIntro();
+	mineSweeper();
+	system("pause");
+}
+
+void mineSweeper() {
+	int board[10][10]; //array for the board
+	for (int i = 0; i < 10; ++i){     //mines created here, mines will equal 9. 
+		int a = rand() % 10;
+		int b = rand() % 10;
+		if (board[a][b] == 9) {   //If an element already equals 9, subtract one from i 
+			i--;				  //so that we don't get duplicates. Else assign 4 to the element. 
+		}
+		else {
+			board[a][b] = 9;			//Assigns 1-8 to elements based on how many mines are adjacent. 
+			/*if (a < 9) {				
+				board[a + 1][b] = 1;
+			}
+			if (a > 1) {
+				board[a - 1][b] = 1;
+			}
+			if (b < 9) {
+				board[a][b + 1] = 1;
+			}
+			if (b > 1) {
+				board[a][b - 1] = 1;
+			}
+			if (a > 1 && b > 1) {
+				board[a - 1][b - 1] = 1;
+			}
+			if (a < 9 && b < 9) {
+				board[a + 1][b + 1] = 1;
+			}
+			if (a < 9 && b > 1) {
+				board[a + 1][b - 1] = 1;
+			}
+			if (a > 1 && b < 9) {
+				board[a - 1][b + 1] = 1;
+			}
+			*/
+		}
+		   
+	} //end of mines
+	
+}
+
+void theIntro() {
+ 	cout << setw(65) << "|Welcome to Minesweeper!|" << endl;
+	cout << setw(65) << "|_______________________|" << endl << endl;
+	cout << setw(100) << "The objective of this game is quite simple. You must find the 10 mines located randomly" << endl;
+	cout << setw(65) << "in the playing field and flag them by pressing F" << endl; 
+}
