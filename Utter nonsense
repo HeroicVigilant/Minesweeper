@@ -1,0 +1,234 @@
+#include "pch.h"
+#include <array>
+#include <iostream>
+#include <iomanip>
+#include <time.h>
+#include <cstring>
+#include <windows.h> 
+#include <conio.h>
+using namespace std;
+
+#define MAXSIDE 10
+#define MAXMINES 10
+
+const int ROWS = 10;
+const int COLS = 10;
+
+void mineSweeper();
+void theIntro();
+void replayGame();
+void create_field(char board[COLS][ROWS]);
+
+//int main()
+//{
+//	theIntro();
+//	mineSweeper();
+//	system("pause");
+//}
+
+void mineSweeper() {
+	char board[COLS][ROWS]; //array for the board
+	int revealed[COLS][ROWS];
+	for (int i = 0; i < 10; ++i) {     //mines created here, mines will equal 9. 
+		int a = rand() % 10;
+		int b = rand() % 10;
+		if (revealed[a][b] == 9) {   //If an element already equals 9, subtract one from i 
+			i--;				  //so that we don't get duplicates. Else assign 9 to the element. 
+		}
+		else {
+			revealed[a][b] = 9;			//Assigns 1-8 to elements based on how many mines are adjacent. 
+			if (a < 9) {
+				revealed[a + 1][b]++;
+			}
+			if (a > 1) {
+				revealed[a - 1][b]++;
+			}
+			if (b < 9) {
+				revealed[a][b + 1]++;
+			}
+			if (b > 1) {
+				revealed[a][b - 1]++;
+			}
+			if (a > 1 && b > 1) {
+				revealed[a - 1][b - 1]++;
+			}
+			if (a < 9 && b < 9) {
+				revealed[a + 1][b + 1]++;
+			}
+			if (a < 9 && b > 1) {
+				revealed[a + 1][b - 1]++;
+			}
+			if (a > 1 && b < 9) {
+				revealed[a - 1][b + 1]++;
+			}
+
+		}
+
+	} //end of mines
+	create_field(board);
+
+	replayGame();
+}
+
+void create_field(char board[COLS][ROWS]) {
+	for (int i = 0; i < ROWS; i++) {
+		for (int j = 0; j < COLS; j++) {
+			board[i][j] = 'x';
+			cout << board[i][j] << " ";
+		
+		}
+		cout << endl; //Added endl here to create the 10x10 instead of just one long line of x
+	}
+}
+
+void theIntro() {
+	cout << setw(65) << "Welcome to Minesweeper!" << endl;
+	cout << setw(65) << "_______________________" << endl << endl;
+	cout << setw(100) << "The objective of this game is quite simple. You must find the 10 mines located randomly" << endl;
+	cout << setw(65) << "in the playing field and flag them by pressing F" << endl;
+
+}
+
+bool isValid(int row, int col)
+{
+	return (row >= 0) && (row < 10) &&
+		(col >= 0) && (col < 10);
+}
+
+bool isMine(int row, int col, char board[][MAXSIDE])
+{
+	if (board[row][col] == '*')
+		return(true);
+	else
+		return (false);
+}
+
+
+
+void makeMove(int *x, int *y)
+{
+	cout << "Enter your move, (row, column) -> ";
+	scanf_s("%d %d", x, y);
+	return;
+}
+void initialise(char realBoard[][MAXSIDE], char myBoard[][MAXSIDE])
+{
+	srand(time(NULL));
+
+	// Starts by assigning all cells as mine-free
+	for (int i = 0; i < COLS; i++)
+	{
+		for (int j = 0; j < COLS; j++)
+		{
+			myBoard[i][j] = realBoard[i][j] = '-';
+
+		}
+	}
+	return;
+}
+
+void replaceMine(int row, int col, char board[][MAXSIDE])
+{
+	for (int i = 0; i < COLS; i++)
+	{
+		for (int j = 0; j < COLS; j++)
+		{
+			if (board[i][j] != '*')
+			{
+				board[i][j] = '*';
+				board[row][col] = '-';
+				return;
+			}
+		}
+	}
+}
+
+void placeMines(int mines[][2], char realBoard[][MAXSIDE])
+{
+	bool mark[MAXSIDE*MAXSIDE];
+
+	memset(mark, false, sizeof(mark));
+
+	for (int i = 0; i < 10; )
+	{
+		int random = rand() % (ROWS * ROWS);
+		int x = random / ROWS;
+		int y = random % COLS;
+
+		if (mark[random] == false)
+		{
+			mines[i][0] = x;
+			mines[i][1] = y;
+
+			realBoard[mines[i][0]][mines[i][1]] = '*';
+			mark[random] = true;
+			i++;
+		}
+	}
+	return;
+}
+
+void replayGame() {
+	cout << "Would you like to play again? Press y/n" << endl;
+	char a;
+	cin >> a;
+	switch (a) {
+	case 'y':
+		mineSweeper();
+		break;
+	case 'n':
+		exit(1);
+	default:
+		cout << "Invalid answer." << endl;
+		replayGame();
+	}
+}
+
+void playMinesweeper()
+{
+	theIntro();
+	bool gameOver = false;
+
+	char realBoard[MAXSIDE][MAXSIDE], myBoard[MAXSIDE][MAXSIDE];
+
+	int x, y;
+	int mines[MAXMINES][2];
+
+	initialise(realBoard, myBoard);
+	placeMines(mines, realBoard);
+
+	int crntMoveIndex = 0;
+	while (gameOver == false)
+	{
+		cout << "Current Status of Board : \n";
+		
+		create_field(myBoard);
+		makeMove(&x, &y);
+
+		if (crntMoveIndex == 0)
+		{
+			if (isMine(x, y, realBoard) == true)
+				replaceMine(x, y, realBoard);
+		}
+
+		crntMoveIndex++;
+		
+
+	}
+	return;
+}
+
+int main()
+{
+	char answer;
+	do
+	{
+		playMinesweeper();
+
+		cout << "Would you like to play again? (y/n) ";
+		cin >> answer;
+	} while (answer == 'y');
+
+		system("pause");
+	return 0;
+}
