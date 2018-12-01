@@ -14,7 +14,9 @@ const int COLS = 10;
 void mineSweeper();
 void theIntro();
 void replayGame();
-void create_field(char board[COLS][ROWS]);
+char create_field(char board[COLS][ROWS]);
+char update_field(char uboard[COLS][ROWS]);
+int getInput(bool& flag, char& a, char& b);
 
 int main()
 {
@@ -23,53 +25,99 @@ int main()
 }
 
 void mineSweeper() {
-	char board[COLS][ROWS]; //array for the board
-	int revealed[COLS][ROWS];
+	system("CLS");
+	char board[COLS][ROWS];//array for the board
+	char reveal[COLS][ROWS];
+	srand(static_cast<unsigned int>(time(0)));
+	for (int i = 0; i < 10; i++) {
+		for (int j = 0; j < 10; j++) {
+			reveal[i][j] = 0; 
+		}
+		
+	}
 	for (int i = 0; i < 10; ++i) {     //mines created here, mines will equal 9. 
 		int a = rand() % 10;
 		int b = rand() % 10;
-		if (revealed[a][b] == 9) {   //If an element already equals 9, subtract one from i 
+		if (reveal[a][b] == 9) {   //If an element already equals 9, subtract one from i 
 			i--;				  //so that we don't get duplicates. Else assign 9 to the element. 
 		}
 		else {
-			revealed[a][b] = 9;			//Assigns 1-8 to elements based on how many mines are adjacent. 
+			reveal[a][b] = 9;			//Assigns 1-8 to elements based on how many mines are adjacent. 
 			if (a < 9) {
-				revealed[a + 1][b]++;
+				reveal[a + 1][b]++;
 			}
 			if (a > 0) {
-				revealed[a - 1][b]++;
+				reveal[a - 1][b]++;
 			}
 			if (b < 9) {
-				revealed[a][b + 1]++;
+				reveal[a][b + 1]++;
 			}
 			if (b > 0) {
-				revealed[a][b - 1]++;
+				reveal[a][b - 1]++;
 			}
-			if (a > 0 && b >0) {
-				revealed[a - 1][b - 1]++;
+			if (a > 0 && b > 0) {
+				reveal[a - 1][b - 1]++;
 			}
 			if (a < 9 && b < 9) {
-				revealed[a + 1][b + 1]++;
+				reveal[a + 1][b + 1]++;
 			}
 			if (a < 9 && b > 0) {
-				revealed[a + 1][b - 1]++;
+				reveal[a + 1][b - 1]++;
 			}
 			if (a > 0 && b < 9) {
-				revealed[a - 1][b + 1]++;
+				reveal[a - 1][b + 1]++;
 			}
-
 		}
-
 	} //end of mines
 	create_field(board);
-
-	replayGame();
+	int gameOver = 0, numMarks = 10;
+	while (gameOver != 9) {
+		cout << setw(62);
+		char guess1 = 0, guess2 = 0;
+		bool mark = false; 
+		int victory = 0;
+		getInput(mark, guess1, guess2);
+		guess1 = guess1 - 65;
+		guess2 = guess2 - 1;
+		if (numMarks < 1) {
+			cout << "You don't have any marks left!" << endl; 
+			cout << "To remove a mark, enter the coordinate of a marked space." << endl;
+			getInput(mark, guess1, guess2);
+		}
+		if (mark == true) {
+			if (reveal[guess1][guess2] == 9 && board[guess1][guess2] != 'M') {
+				victory++;
+				numMarks--;
+				board[guess1][guess2] = 'M';
+			}
+			if (board[guess1][guess2] == 'M') {
+				board[guess1][guess2] = 'x';
+				numMarks++;
+			}
+			else
+			board[guess1][guess2] = 'M';
+		
+		}
+		else {
+			board[guess1][guess2] = reveal[guess1][guess2];
+		}
+		gameOver = board[guess1][guess2];
+		if (victory = 10) {
+			cout << "You win!";
+		}
+		update_field(board);
+	}
+	
+	if (gameOver == 9) {
+		cout << "You hit a mine :( Game Over!" << endl;
+		replayGame();
+	}
 }
 
-void create_field(char board[COLS][ROWS]) {
-	cout << setw(11);
+char create_field(char board[COLS][ROWS]) {
+	cout << setw(11) << endl;
 	for (int a = 0; a < 10; a++) {
-		cout << a + 1;
+		cout << a;
 		if (a < 9) {
 			cout << setw(11);
 		}
@@ -77,7 +125,7 @@ void create_field(char board[COLS][ROWS]) {
 	cout << endl << endl << "A";
 	for (int i = 0; i < ROWS; i++) {
 		for (int j = 0; j < COLS; j++) {
-			board[i][j] = 'o';
+			board[i][j] = 'x';
 			cout << setw(10) << board[i][j] << " ";
 
 		}
@@ -92,14 +140,75 @@ void create_field(char board[COLS][ROWS]) {
 	}
 	  //This will turn it into a true 10x10 grid
 	  //Made some changes to make it fit the screen better, as well as giving coordinates. 
+	return board[COLS][ROWS];
 }
 
-void theIntro() {
-	cout << setw(65) << "Welcome to Minesweeper!" << endl;
-	cout << setw(65) << "_______________________" << endl << endl;
-	cout << setw(100) << "The objective of this game is quite simple. You must find the 10 mines located randomly" << endl;
-	cout << setw(65) << "in the playing field and flag them by pressing F" << endl;
+char update_field(char uboard[COLS][ROWS]) {
+	system("CLS");
+	cout << setw(11) << endl;
+	for (int a = 0; a < 10; a++) {
+		cout << a;
+		if (a < 9) {
+			cout << setw(11);
+		}
+	}
+	cout << endl << endl << "A";
+	for (int i = 0; i < ROWS; i++) {
+		for (int j = 0; j < COLS; j++) {
+			cout << setw(10) << uboard[i][j] << " ";
+		}
+		int b = 0;
+		if (i < 9) {
+			b = 66 + i;
+		}
+		else {
+			b = 0;
+		}
+		cout << endl << endl << (char)b;
+	}
+	return uboard[COLS][ROWS];
+}
 
+
+void theIntro() {
+	cout << setw(68) << "Welcome to Minesweeper!" << endl;
+	cout << setw(68) << "_______________________" << endl << endl;
+	cout << setw(104) << "The objective of this game is quite simple. You must find the 10 mines located randomly" << endl;
+	cout << setw(105) << "in the playing field and mark them by pressing M before you're selection. If you mark all" << endl;
+	cout << setw(100) << "10 mines you win. If your selection without a mark is ever a mine, you lose." << endl;
+	cout << setw(108) << "The numbers labeled 1-8 indicate how many spaces away a mine is from that position. Good Luck!" << endl << endl;
+	cout << setw(95) << "Would you like to play? Press 'y' to play or press any button to exit: ";
+	char ans;
+	cin >> ans;
+	if (ans == 'y')
+		return;
+	else
+		exit(1);
+
+	
+}
+
+int getInput(bool& flag, char &a, char &b) {
+	cout << "Enter a coordinate (Put M infront to mark): ";
+	cin >> a; 
+	if (a == 'M') {
+		flag = true;
+		a = 0;
+		cin >> a; 
+	}
+	if ((char)a >= 97 && (char)a <= 106) {
+		a = a - 32;
+	}
+	while (!isalpha(a) || (char)a < 65 || (char)a > 75) {
+		cout << setw(72) << "Invalid input. Please Enter a letter: ";
+		cin >> a;
+	}
+	cin >> b;
+	while (!isdigit(b)) {
+		cout << setw(72) << "Invalid input. Please Enter a number: ";
+		cin >> b;
+	}
+	return flag, a, b;
 }
 
 void replayGame() {
