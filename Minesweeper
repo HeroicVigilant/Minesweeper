@@ -83,17 +83,17 @@ void mineSweeper() {
 		col = col - 48;
 		
 		if (mark == true) {     //If mark returns true, go through the marking process. 
-			if (uboard[row][col] == 'M') {
-				uboard[row][col] = 'x';
+			if (uboard[row][col] == (char)77) {
+				uboard[row][col] = 120;
 				numMarks++;
 			}
-			if (numMarks == 0) {
+			else if(numMarks == 0) {
 				cout << "You don't have any marks left!" << endl;
 				cout << "To remove a mark, enter the coordinate of a marked space." << endl;
 				getInput(mark, row, col);
 			}
 			else {
-				uboard[row][col] = 'M';
+				uboard[row][col] = 77;
 				numMarks--;
 			}
 		}
@@ -106,7 +106,7 @@ void mineSweeper() {
 			for (int i = 0; i < 10; i++)
 				for (int j = 0; j < 10; j++) {
 					if (reveal[i][j] == 9)
-						if (uboard[i][j] == 'M')
+						if (uboard[i][j] == 77)
 							victory++;
 				}
 
@@ -175,6 +175,9 @@ char update_field(int uboard[ROWS][COLS]) {
 		for (int j = 0; j < COLS; j++) {
 			if (uboard[i][j] == 120) {
 				cout << setw(10) << (char)120 << " ";
+			}
+			else if (uboard[i][j] == 77){
+				cout << setw(10) << (char)77 << " ";
 			}
 			else if (uboard[i][j] == 0) {
 				cout  << setw(10) << " " << " ";
@@ -250,8 +253,8 @@ void theIntro() {
 	cout << setw(68) << "_______________________" << endl << endl;
 	cout << setw(104) << "The objective of this game is quite simple. You must find the 10 mines located randomly" << endl;
 	cout << setw(105) << "in the playing field and mark them by pressing M before you're selection. If you mark all" << endl;
-	cout << setw(100) << "10 mines you win. If your selection without a mark is ever a mine, you lose." << endl;
-	cout << setw(108) << "The numbers labeled 1-8 indicate how many spaces away a mine is from that position. Good Luck!" << endl << endl;
+	cout << setw(105) << "10 mines you win. If your selection without a mark is ever a mine, you lose. The numbers" << endl;
+	cout << setw(90) << "labeled 1-8 indicate how many ajacent spaces have mines." << endl << endl;
 	cout << setw(95) << "Would you like to play? Press 'y' to play or press any button to exit: ";
 	char ans;
 	cin >> ans;
@@ -269,7 +272,6 @@ int getInput(bool& mark, char &a, char &b) {
 	cin >> c;
 	if (c == 'M') {
 		mark = 1;
-		a = 0;
 		cin >> a;
 	}
 	else {
