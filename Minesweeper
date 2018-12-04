@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <time.h>
 #include <cstring>
+#include <string>
 using namespace std;
 
 const int ROWS = 10;
@@ -15,7 +16,8 @@ void replayGame();
 //int revealBoard(int a, int b, int ufield[ROWS][COLS], int reveal[ROWS][COLS]);
 char create_field(char board[ROWS][COLS]);
 char update_field(int uboard[ROWS][COLS]);
-int getInput(bool& flag, char& a, char& b);
+int getInput(bool& flag, char& a, char& b, int* numMarks, int uboard[ROWS][COLS]);
+
 
 int main()
 {
@@ -25,11 +27,15 @@ int main()
 
 void mineSweeper() {
 	system("CLS");
-	char board[COLS][ROWS];//array for the board
+	char board[COLS][ROWS], finput = 12, sinput;
+	bool firstMark = 0;
 	int reveal[COLS][ROWS], uboard[COLS][ROWS];
 	int gameOver = 0, numMarks = 10;
 	srand(static_cast<unsigned int>(time(0)));
 	create_field(board);
+	while (finput = 12) {
+		getInput(firstMark, finput, sinput, numMarks);
+	}
 	for (int i = 0; i < 10; i++) {
 		for (int j = 0; j < 10; j++) {
 			reveal[i][j] = 0;
@@ -45,10 +51,10 @@ void mineSweeper() {
 		}
 		else {
 			reveal[a][b] = 9;			//Assigns 1-8 to elements based on how many mines are adjacent. 
-			if (a < 9 && reveal[a + 1][b] !=9) {
+			if (a < 9 && reveal[a + 1][b] != 9) {
 				reveal[a + 1][b]++;
 			}
-			if (a > 0 && reveal[a - 1][b] !=9) {
+			if (a > 0 && reveal[a - 1][b] != 9) {
 				reveal[a - 1][b]++;
 			}
 			if (b < 9 && reveal[a][b + 1] != 9) {
@@ -78,19 +84,16 @@ void mineSweeper() {
 		int victory = 0, d = 0;
 		cout << "You have " << numMarks << " marks left." << endl;
 		cout << setw(85);
-		getInput(mark, row, col);
-		row = row - 65;
-		col = col - 48;
-		
+		getInput(mark, row, col, numMarks, uboard[ROWS][COLS] );
 		if (mark == true) {     //If mark returns true, go through the marking process. 
 			if (uboard[row][col] == (char)77) {
 				uboard[row][col] = 120;
 				numMarks++;
 			}
-			else if(numMarks == 0) {
+			else if (numMarks == 0) {
 				cout << "You don't have any marks left!" << endl;
 				cout << "To remove a mark, enter the coordinate of a marked space." << endl;
-				getInput(mark, row, col);
+				getInput(mark, row, col, numMarks);
 			}
 			else {
 				uboard[row][col] = 77;
@@ -125,7 +128,7 @@ void mineSweeper() {
 				for (int j = 0; j < 10; j++)
 					if (reveal[i][j] == 9)
 						uboard[i][j] = 9;
-						update_field(uboard);
+			update_field(uboard);
 		}
 		cout << "You hit a mine :( Game Over!" << endl;
 		replayGame();
@@ -176,11 +179,11 @@ char update_field(int uboard[ROWS][COLS]) {
 			if (uboard[i][j] == 120) {
 				cout << setw(10) << (char)120 << " ";
 			}
-			else if (uboard[i][j] == 77){
+			else if (uboard[i][j] == 77) {
 				cout << setw(10) << (char)77 << " ";
 			}
 			else if (uboard[i][j] == 0) {
-				cout  << setw(10) << " " << " ";
+				cout << setw(10) << " " << " ";
 			}
 			else
 				cout << setw(10) << uboard[i][j] << " ";
@@ -194,7 +197,7 @@ char update_field(int uboard[ROWS][COLS]) {
 		}
 		cout << endl << endl << (char)b;
 	}
-	
+
 	return uboard[COLS][ROWS];
 }
 
@@ -266,7 +269,9 @@ void theIntro() {
 
 }
 
-int getInput(bool& mark, char &a, char &b) {
+
+
+int getInput(bool& mark, char &a, char &b, int& numMarks, int uboard[ROWS][COLS]) {
 	cout << "Enter a coordinate (Put M infront to mark): ";
 	char c;
 	cin >> c;
@@ -290,6 +295,8 @@ int getInput(bool& mark, char &a, char &b) {
 		cout << setw(72) << "Invalid input. Please Enter a number: ";
 		cin >> b;
 	}
+	a = a - 65;
+	b = b - 48;
 	return mark, a, b;
 }
 
