@@ -468,6 +468,7 @@ int getInput(bool& mark, char &a, char &b, int numMarks, int uboard[ROWS][COLS])
 			system("pause");
 			exit(1);
 		}
+		cin >> d;
 	}
 	a = d[0];
 	b = d[1];
