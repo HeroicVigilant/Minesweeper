@@ -14,8 +14,8 @@ const int COLS = 10;
 void mineSweeper();
 void theIntro();
 void replayGame();
-int revealBoard(int a, int b, int ufield[ROWS][COLS], int reveal[ROWS][COLS]);
 char update_field(int uboard[ROWS][COLS]);
+int revealBoard(int a, int b, int ufield[ROWS][COLS], int reveal[ROWS][COLS]);
 int getInput(bool& flag, char& a, char& b, int numMarks, int uboard[ROWS][COLS]);
 int firstMove(bool& flag, char& a, char& b, int numMarks, int uboard[ROWS][COLS], int reveal[ROWS][COLS]);
 int placeMines(int reveal[ROWS][COLS]);
@@ -190,35 +190,35 @@ char update_field(int uboard[ROWS][COLS]) {
 
 int revealBoard(int a, int b, int uboard[ROWS][COLS], int reveal[ROWS][COLS]) {
 	int tempa = a, tempb = b;
-	while (reveal[a + 1][b] != 9 && a < 9 && uboard[a+1][b] != (char)77) {
+	while (reveal[a + 1][b] != 9 && a < 9 && uboard[a + 1][b] != (char)77) {
 		uboard[a + 1][b] = reveal[a + 1][b];
 		a++;
 
 	}
 	a = tempa;
 	b = tempb;
-	while (reveal[a - 1][b] != 9 && a > 0 && uboard[a-1][b] != (char)77) {
+	while (reveal[a - 1][b] != 9 && a > 0 && uboard[a - 1][b] != (char)77) {
 		uboard[a - 1][b] = reveal[a - 1][b];
 		a--;
 
 	}
 	a = tempa;
 	b = tempb;
-	while (reveal[a][b + 1] != 9 && b < 9 && uboard[a][b+1] != (char)77) {
+	while (reveal[a][b + 1] != 9 && b < 9 && uboard[a][b + 1] != (char)77) {
 		uboard[a][b + 1] = reveal[a][b + 1];
 		b++;
 
 	}
 	a = tempa;
 	b = tempb;
-	while (reveal[a][b - 1] != 9 && b > 0 && uboard[a][b-1] != (char)77) {
+	while (reveal[a][b - 1] != 9 && b > 0 && uboard[a][b - 1] != (char)77) {
 		uboard[a][b - 1] = reveal[a][b - 1];
 		b--;
 
 	}
 	a = tempa;
 	b = tempb;
-	while (reveal[a - 1][b - 1] != 9 && b > 0 && a > 0 && uboard[a-1][b-1] != (char)77) {
+	while (reveal[a - 1][b - 1] != 9 && b > 0 && a > 0 && uboard[a - 1][b - 1] != (char)77) {
 		uboard[a - 1][b - 1] = reveal[a - 1][b - 1];
 		a--;
 		b--;
@@ -226,7 +226,7 @@ int revealBoard(int a, int b, int uboard[ROWS][COLS], int reveal[ROWS][COLS]) {
 	}
 	a = tempa;
 	b = tempb;
-	while (reveal[a + 1][b + 1] != 9 && b < 9 && a < 9 && uboard[a+1][b+1] != (char)77) {
+	while (reveal[a + 1][b + 1] != 9 && b < 9 && a < 9 && uboard[a + 1][b + 1] != (char)77) {
 		uboard[a + 1][b + 1] = reveal[a + 1][b + 1];
 		a++;
 		b++;
@@ -234,7 +234,7 @@ int revealBoard(int a, int b, int uboard[ROWS][COLS], int reveal[ROWS][COLS]) {
 	}
 	a = tempa;
 	b = tempb;
-	while (reveal[a + 1][b - 1] != 9 && a < 9 && b > 0 && uboard[a+1][b-1] != (char)77) {
+	while (reveal[a + 1][b - 1] != 9 && a < 9 && b > 0 && uboard[a + 1][b - 1] != (char)77) {
 		uboard[a + 1][b - 1] = reveal[a + 1][b - 1];
 		a++;
 		b--;
@@ -242,7 +242,7 @@ int revealBoard(int a, int b, int uboard[ROWS][COLS], int reveal[ROWS][COLS]) {
 	}
 	a = tempa;
 	b = tempb;
-	while (reveal[a - 1][b + 1] != 9 && b < 9 && a > 0 && uboard[a-1][b+1] != (char)77) {
+	while (reveal[a - 1][b + 1] != 9 && b < 9 && a > 0 && uboard[a - 1][b + 1] != (char)77) {
 		uboard[a - 1][b + 1] = reveal[a - 1][b + 1];
 		a--;
 		b++;
@@ -361,7 +361,7 @@ int firstMove(bool& flag, char& a, char& b, int numMarks, int uboard[ROWS][COLS]
 			reveal[a][b] = 0;
 			uboard[a][b] = reveal[a][b];
 			revealBoard(a, b, uboard, reveal);
-			//revealBoard(row, col, uboard, reveal);
+			
 		}
 
 		update_field(uboard);
@@ -410,7 +410,7 @@ int getInput(bool& mark, char &a, char &b, int numMarks, int uboard[ROWS][COLS])
 		update_field(uboard);
 		getInput(mark, a, b, numMarks, uboard);
 	}
-	while (!isdigit(b) || b >  57 || b < 48 ) {
+	while (!isdigit(b) || b > 57 || b < 48) {
 		if (e.length() != 1) {
 			cout << setw(80) << "Invalid input. Enter something else  ";
 			cin >> e;
