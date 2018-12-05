@@ -190,35 +190,35 @@ char update_field(int uboard[ROWS][COLS]) {
 
 int revealBoard(int a, int b, int uboard[ROWS][COLS], int reveal[ROWS][COLS]) {
 	int tempa = a, tempb = b;
-	while (reveal[a + 1][b] != 9 && a < 9) {
+	while (reveal[a + 1][b] != 9 && a < 9 && uboard[a+1][b] != (char)77) {
 		uboard[a + 1][b] = reveal[a + 1][b];
 		a++;
 
 	}
 	a = tempa;
 	b = tempb;
-	while (reveal[a - 1][b] != 9 && a > 0) {
+	while (reveal[a - 1][b] != 9 && a > 0 && uboard[a-1][b] != (char)77) {
 		uboard[a - 1][b] = reveal[a - 1][b];
 		a--;
 
 	}
 	a = tempa;
 	b = tempb;
-	while (reveal[a][b + 1] != 9 && b < 9) {
+	while (reveal[a][b + 1] != 9 && b < 9 && uboard[a][b+1] != (char)77) {
 		uboard[a][b + 1] = reveal[a][b + 1];
 		b++;
 
 	}
 	a = tempa;
 	b = tempb;
-	while (reveal[a][b - 1] != 9 && b > 0) {
+	while (reveal[a][b - 1] != 9 && b > 0 && uboard[a][b-1] != (char)77) {
 		uboard[a][b - 1] = reveal[a][b - 1];
 		b--;
 
 	}
 	a = tempa;
 	b = tempb;
-	while (reveal[a - 1][b - 1] != 9 && b > 0 && a > 0) {
+	while (reveal[a - 1][b - 1] != 9 && b > 0 && a > 0 && uboard[a-1][b-1] != (char)77) {
 		uboard[a - 1][b - 1] = reveal[a - 1][b - 1];
 		a--;
 		b--;
@@ -226,7 +226,7 @@ int revealBoard(int a, int b, int uboard[ROWS][COLS], int reveal[ROWS][COLS]) {
 	}
 	a = tempa;
 	b = tempb;
-	while (reveal[a + 1][b + 1] != 9 && b < 9 && a < 9) {
+	while (reveal[a + 1][b + 1] != 9 && b < 9 && a < 9 && uboard[a+1][b+1] != (char)77) {
 		uboard[a + 1][b + 1] = reveal[a + 1][b + 1];
 		a++;
 		b++;
@@ -234,7 +234,7 @@ int revealBoard(int a, int b, int uboard[ROWS][COLS], int reveal[ROWS][COLS]) {
 	}
 	a = tempa;
 	b = tempb;
-	while (reveal[a + 1][b - 1] != 9 && a < 9 && b > 0) {
+	while (reveal[a + 1][b - 1] != 9 && a < 9 && b > 0 && uboard[a+1][b-1] != (char)77) {
 		uboard[a + 1][b - 1] = reveal[a + 1][b - 1];
 		a++;
 		b--;
@@ -242,7 +242,7 @@ int revealBoard(int a, int b, int uboard[ROWS][COLS], int reveal[ROWS][COLS]) {
 	}
 	a = tempa;
 	b = tempb;
-	while (reveal[a - 1][b + 1] != 9 && b < 9 && a > 0) {
+	while (reveal[a - 1][b + 1] != 9 && b < 9 && a > 0 && uboard[a-1][b+1] != (char)77) {
 		uboard[a - 1][b + 1] = reveal[a - 1][b + 1];
 		a--;
 		b++;
@@ -278,31 +278,95 @@ void theIntro() {
 }
 
 int firstMove(bool& flag, char& a, char& b, int numMarks, int uboard[ROWS][COLS], int reveal[ROWS][COLS]) {
-	getInput(flag, a, b, numMarks, uboard);
-		if (flag == true) {     //If mark returns true, go through the marking process. 
-			if (uboard[a][b] != 120 && uboard[a][b] != 77) {
-				flag = false;
+	while (flag == true) {     //If mark returns true, go through the marking process. 
+		if (uboard[a][b] != 120 && uboard[a][b] != 77) {
+			flag = false;
 
+		}
+		else if (uboard[a][b] == (char)77) {
+			uboard[a][b] = 120;
+			numMarks++;
+			flag = false;
+		}
+		else if (numMarks == 0) {
+			flag = false;
+		}
+		else {
+			uboard[a][b] = 77;
+			numMarks--;
+			update_field(uboard);
+			flag = false;
+		}
+	}
+	if (reveal[a][b] == 9) {
+		if (a < 9 && reveal[a + 1][b] != 9) {
+			reveal[a + 1][b]--;
+		}
+		if (a > 0 && reveal[a - 1][b] != 9) {
+			reveal[a - 1][b]--;
+		}
+		if (b < 9 && reveal[a][b + 1] != 9) {
+			reveal[a][b + 1]--;
+		}
+		if (b > 0 && reveal[a][b - 1] != 9) {
+			reveal[a][b - 1]--;
+		}
+		if (a > 0 && b > 0 && reveal[a - 1][b - 1] != 9) {
+			reveal[a - 1][b - 1]--;
+		}
+		if (a < 9 && b < 9 && reveal[a + 1][b + 1] != 9) {
+			reveal[a + 1][b + 1]--;
+		}
+		if (a < 9 && b > 0 && reveal[a + 1][b - 1] != 9) {
+			reveal[a + 1][b - 1]--;
+		}
+		if (a > 0 && b < 9 && reveal[a - 1][b + 1] != 9) {
+			reveal[a - 1][b + 1]--;
+		}
+		int a = rand() % 10;
+		int b = rand() % 10;
+		while (reveal[a][b] == 9) {
+			a = rand() % 10;
+			b = rand() % 10;
+		}
+		if (reveal[a][b] != 9) {
+			reveal[a][b] = 9;			//Assigns 1-8 to elements based on how many mines are adjacent. 
+			if (a < 9 && reveal[a + 1][b] != 9) {
+				reveal[a + 1][b]++;
 			}
-			else if (uboard[a][b] == (char)77) {
-				uboard[a][b] = 120;
-				numMarks++;
+			if (a > 0 && reveal[a - 1][b] != 9) {
+				reveal[a - 1][b]++;
 			}
-			else if (numMarks == 0) {
-				flag = false;
+			if (b < 9 && reveal[a][b + 1] != 9) {
+				reveal[a][b + 1]++;
 			}
-			else {
-				uboard[a][b] = 77;
-				numMarks--;
+			if (b > 0 && reveal[a][b - 1] != 9) {
+				reveal[a][b - 1]++;
+			}
+			if (a > 0 && b > 0 && reveal[a - 1][b - 1] != 9) {
+				reveal[a - 1][b - 1]++;
+			}
+			if (a < 9 && b < 9 && reveal[a + 1][b + 1] != 9) {
+				reveal[a + 1][b + 1]++;
+			}
+			if (a < 9 && b > 0 && reveal[a + 1][b - 1] != 9) {
+				reveal[a + 1][b - 1]++;
+			}
+			if (a > 0 && b < 9 && reveal[a - 1][b + 1] != 9) {
+				reveal[a - 1][b + 1]++;
 			}
 		}
+
 		else { //if mark is false, reveal the space. 
 			reveal[a][b] = 0;
 			uboard[a][b] = reveal[a][b];
+			revealBoard(a, b, uboard, reveal);
 			//revealBoard(row, col, uboard, reveal);
 		}
-	update_field(uboard);
-	return flag, a, b, numMarks, uboard[a][b], reveal[a][b];
+
+		update_field(uboard);
+		return flag, a, b, numMarks, uboard[a][b], reveal[a][b];
+	}
 }
 
 
@@ -331,6 +395,9 @@ int getInput(bool& mark, char &a, char &b, int numMarks, int uboard[ROWS][COLS])
 		cout << "Marks: " << numMarks << endl;
 		cout << setw(85);
 		cout << "Enter a coordinate (Put M infront to mark): ";
+		if (mark = true) {
+			cout << "M";
+		}
 		cin >> d;
 	}
 	a = d[0];
