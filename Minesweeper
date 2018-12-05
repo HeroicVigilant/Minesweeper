@@ -5,6 +5,7 @@
 #include <time.h>
 #include <cstring>
 #include <string>
+#include <windows.h>
 using namespace std;
 
 const int ROWS = 10;
@@ -13,11 +14,11 @@ const int COLS = 10;
 void mineSweeper();
 void theIntro();
 void replayGame();
-//int revealBoard(int a, int b, int ufield[ROWS][COLS], int reveal[ROWS][COLS]);
-char create_field(char board[ROWS][COLS]);
+int revealBoard(int a, int b, int ufield[ROWS][COLS], int reveal[ROWS][COLS]);
 char update_field(int uboard[ROWS][COLS]);
-int getInput(bool& flag, char& a, char& b, int* numMarks, int uboard[ROWS][COLS]);
-
+int getInput(bool& flag, char& a, char& b, int numMarks, int uboard[ROWS][COLS]);
+int firstMove(bool& flag, char& a, char& b, int numMarks, int uboard[ROWS][COLS], int reveal[ROWS][COLS]);
+int placeMines(int reveal[ROWS][COLS]);
 
 int main()
 {
@@ -26,23 +27,80 @@ int main()
 }
 
 void mineSweeper() {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 	system("CLS");
-	char board[COLS][ROWS], finput = 12, sinput;
-	bool firstMark = 0;
+	bool firstMark = false;
+	char firsta = 12, firstb = 0;
 	int reveal[COLS][ROWS], uboard[COLS][ROWS];
 	int gameOver = 0, numMarks = 10;
 	srand(static_cast<unsigned int>(time(0)));
-	create_field(board);
-	while (finput = 12) {
-		getInput(firstMark, finput, sinput, numMarks);
-	}
 	for (int i = 0; i < 10; i++) {
 		for (int j = 0; j < 10; j++) {
 			reveal[i][j] = 0;
 			uboard[i][j] = 120;
 		}
-
 	}
+	update_field(uboard); //beginning field
+	placeMines(reveal);
+	firstMove(firstMark, firsta, firstb, numMarks, uboard, reveal);
+	while (gameOver != 9) {
+		char row = 0, col = 0;
+		bool mark = 0;
+		int victory = 0, d = 0;
+		getInput(mark, row, col, numMarks, uboard);
+		if (mark == true) {     //If mark returns true, go through the marking process. 
+			if (uboard[row][col] != 120 && uboard[row][col] != 77) {
+				mark = false;
+
+			}
+			else if (uboard[row][col] == (char)77) {
+				uboard[row][col] = 120;
+				numMarks++;
+			}
+			else if (numMarks == 0) {
+				mark = false;
+			}
+			else {
+				uboard[row][col] = 77;
+				numMarks--;
+			}
+		}
+		else { //if mark is false, reveal the space. 
+
+			uboard[row][col] = reveal[row][col];
+			revealBoard(row, col, uboard, reveal);
+		}
+		if (numMarks == 0) {   //This will calculate if you win or not when you reach 0 marks left. 
+			for (int i = 0; i < 10; i++)
+				for (int j = 0; j < 10; j++) {
+					if (reveal[i][j] == 9)
+						if (uboard[i][j] == 77)
+							victory++;
+				}
+
+		}
+		if (victory == 10) {
+			cout << "You win!" << endl;
+			replayGame();
+		}
+		gameOver = uboard[row][col]; //Lose condition here. 
+		update_field(uboard);
+	}
+
+	if (gameOver == 9) {
+		if (gameOver == 9) {		//Shows position of all mines if you lose. 
+			for (int i = 0; i < 10; i++)
+				for (int j = 0; j < 10; j++)
+					if (reveal[i][j] == 9)
+						uboard[i][j] = 9;
+			update_field(uboard);
+		}
+		cout << "You hit a mine :( Game Over!" << endl;
+		replayGame();
+	}
+}
+
+int placeMines(int reveal[ROWS][COLS]) {
 	for (int i = 0; i < 10; ++i) {     //mines created here, mines will equal 9. 
 		int a = rand() % 10;
 		int b = rand() % 10;
@@ -76,96 +134,14 @@ void mineSweeper() {
 				reveal[a - 1][b + 1]++;
 			}
 		}
-	} //end of mines
-	while (gameOver != 9) {
-		cout << setw(60);
-		char row = 0, col = 0;
-		bool mark = 0;
-		int victory = 0, d = 0;
-		cout << "You have " << numMarks << " marks left." << endl;
-		cout << setw(85);
-		getInput(mark, row, col, numMarks, uboard[ROWS][COLS] );
-		if (mark == true) {     //If mark returns true, go through the marking process. 
-			if (uboard[row][col] == (char)77) {
-				uboard[row][col] = 120;
-				numMarks++;
-			}
-			else if (numMarks == 0) {
-				cout << "You don't have any marks left!" << endl;
-				cout << "To remove a mark, enter the coordinate of a marked space." << endl;
-				getInput(mark, row, col, numMarks);
-			}
-			else {
-				uboard[row][col] = 77;
-				numMarks--;
-			}
-		}
-		else { //if mark is false, reveal the space. 
-
-			uboard[row][col] = reveal[row][col];
-			//revealBoard(row, col, uboard, reveal);
-		}
-		if (numMarks == 0) {   //This will calculate if you win or not when you reach 0 marks left. 
-			for (int i = 0; i < 10; i++)
-				for (int j = 0; j < 10; j++) {
-					if (reveal[i][j] == 9)
-						if (uboard[i][j] == 77)
-							victory++;
-				}
-
-		}
-		if (victory == 10) {
-			cout << "You win!" << endl;
-			replayGame();
-		}
-		gameOver = uboard[row][col]; //Lose condition here. 
-		update_field(uboard);
 	}
-
-	if (gameOver == 9) {
-		if (gameOver == 9) {		//Shows position of all mines if you lose. 
-			for (int i = 0; i < 10; i++)
-				for (int j = 0; j < 10; j++)
-					if (reveal[i][j] == 9)
-						uboard[i][j] = 9;
-			update_field(uboard);
-		}
-		cout << "You hit a mine :( Game Over!" << endl;
-		replayGame();
-	}
-}
-
-char create_field(char board[ROWS][COLS]) {
-	cout << setw(11) << endl;
-	for (int a = 0; a < 10; a++) {
-		cout << a;
-		if (a < 9) {
-			cout << setw(11);
-		}
-	}
-	cout << endl << endl << "A";
-	for (int i = 0; i < ROWS; i++) {
-		for (int j = 0; j < COLS; j++) {
-			board[i][j] = 'x';
-			cout << setw(10) << board[i][j] << " ";
-
-		}
-		int b = 0;
-		if (i < 9) {
-			b = 66 + i;
-		}
-		else {
-			b = 0;
-		}
-		cout << endl << endl << (char)b;
-	}
-	//This will turn it into a true 10x10 grid
-	//Made some changes to make it fit the screen better, as well as giving coordinates. 
-	return board[COLS][ROWS];
+	return reveal[ROWS][COLS];
 }
 
 char update_field(int uboard[ROWS][COLS]) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 	system("CLS");
+	SetConsoleTextAttribute(h, 3);
 	cout << setw(11) << endl;
 	for (int a = 0; a < 10; a++) {
 		cout << a;
@@ -174,20 +150,31 @@ char update_field(int uboard[ROWS][COLS]) {
 		}
 	}
 	cout << endl << endl << "A";
+
 	for (int i = 0; i < ROWS; i++) {
 		for (int j = 0; j < COLS; j++) {
 			if (uboard[i][j] == 120) {
+				SetConsoleTextAttribute(h, 3);
 				cout << setw(10) << (char)120 << " ";
 			}
 			else if (uboard[i][j] == 77) {
+				SetConsoleTextAttribute(h, 6);
 				cout << setw(10) << (char)77 << " ";
 			}
 			else if (uboard[i][j] == 0) {
+				SetConsoleTextAttribute(h, 3);
 				cout << setw(10) << " " << " ";
 			}
-			else
-				cout << setw(10) << uboard[i][j] << " ";
+			else if (uboard[i][j] == 9) {
+				SetConsoleTextAttribute(h, 12);
+				cout << setw(10) << ":(" << " ";
+			}
+			else {
+				SetConsoleTextAttribute(h, 13);
+				cout << setw(10) << (uboard[i][j]) << " ";
+			}
 		}
+		SetConsoleTextAttribute(h, 3);
 		int b = 0;
 		if (i < 9) {
 			b = 66 + i;
@@ -201,57 +188,72 @@ char update_field(int uboard[ROWS][COLS]) {
 	return uboard[COLS][ROWS];
 }
 
-/*int revealBoard(int a,int b, int uboard[ROWS][COLS], int reveal[ROWS][COLS]) {
+int revealBoard(int a, int b, int uboard[ROWS][COLS], int reveal[ROWS][COLS]) {
 	int tempa = a, tempb = b;
-	while(reveal[a + 1][b] != 1 && a < 9){
+	while (reveal[a + 1][b] != 9 && a < 9) {
 		uboard[a + 1][b] = reveal[a + 1][b];
 		a++;
+
 	}
 	a = tempa;
-	while (reveal[a - 1][b] != 1 && a > 0 ) {
+	b = tempb;
+	while (reveal[a - 1][b] != 9 && a > 0) {
 		uboard[a - 1][b] = reveal[a - 1][b];
 		a--;
+
 	}
 	a = tempa;
-	while (reveal[a][b + 1] != 1 && b < 9) {
+	b = tempb;
+	while (reveal[a][b + 1] != 9 && b < 9) {
 		uboard[a][b + 1] = reveal[a][b + 1];
 		b++;
+
 	}
 	a = tempa;
 	b = tempb;
-	while (reveal[a][b - 1] != 1 && b > 0) {
+	while (reveal[a][b - 1] != 9 && b > 0) {
 		uboard[a][b - 1] = reveal[a][b - 1];
 		b--;
+
 	}
+	a = tempa;
 	b = tempb;
-	while (reveal[a - 1][b - 1] != 1 && b > 0 && a > 0) {
+	while (reveal[a - 1][b - 1] != 9 && b > 0 && a > 0) {
 		uboard[a - 1][b - 1] = reveal[a - 1][b - 1];
 		a--;
 		b--;
+
 	}
 	a = tempa;
 	b = tempb;
-	while (reveal[a + 1][b + 1] != 1 && b < 9 && a < 9) {
+	while (reveal[a + 1][b + 1] != 9 && b < 9 && a < 9) {
 		uboard[a + 1][b + 1] = reveal[a + 1][b + 1];
 		a++;
 		b++;
-	}
-	while (reveal[a + 1][b - 1] != 1 && a < 9 && b > 0) {
-		uboard[a + 1][b - 1] = reveal[a + 1][b - 1];
-		a++;
-		b--;
+
 	}
 	a = tempa;
 	b = tempb;
-	while (reveal[a - 1][b + 1] != 1 && b < 9 && a > 0) {
+	while (reveal[a + 1][b - 1] != 9 && a < 9 && b > 0) {
+		uboard[a + 1][b - 1] = reveal[a + 1][b - 1];
+		a++;
+		b--;
+
+	}
+	a = tempa;
+	b = tempb;
+	while (reveal[a - 1][b + 1] != 9 && b < 9 && a > 0) {
 		uboard[a - 1][b + 1] = reveal[a - 1][b + 1];
 		a--;
 		b++;
+
 	}
 	return uboard[ROWS][COLS];
-}*/
+}
 
 void theIntro() {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(h, 3);
 	cout << setw(68) << "Welcome to Minesweeper!" << endl;
 	cout << setw(68) << "_______________________" << endl << endl;
 	cout << setw(104) << "The objective of this game is quite simple. You must find the 10 mines located randomly" << endl;
@@ -259,58 +261,122 @@ void theIntro() {
 	cout << setw(105) << "10 mines you win. If your selection without a mark is ever a mine, you lose. The numbers" << endl;
 	cout << setw(90) << "labeled 1-8 indicate how many ajacent spaces have mines." << endl << endl;
 	cout << setw(95) << "Would you like to play? Press 'y' to play or press any button to exit: ";
-	char ans;
-	cin >> ans;
-	if (ans == 'y')
-		return;
+	string input;
+	cin >> input;
+	if (input.length() == 1) {
+		char a;
+		a = input[0];
+		if (a == 'y' || a == 'Y') {
+			return;
+		}
+		else {
+			exit(1);
+		}
+	}
 	else
 		exit(1);
+}
 
+int firstMove(bool& flag, char& a, char& b, int numMarks, int uboard[ROWS][COLS], int reveal[ROWS][COLS]) {
+	getInput(flag, a, b, numMarks, uboard);
+		if (flag == true) {     //If mark returns true, go through the marking process. 
+			if (uboard[a][b] != 120 && uboard[a][b] != 77) {
+				flag = false;
 
+			}
+			else if (uboard[a][b] == (char)77) {
+				uboard[a][b] = 120;
+				numMarks++;
+			}
+			else if (numMarks == 0) {
+				flag = false;
+			}
+			else {
+				uboard[a][b] = 77;
+				numMarks--;
+			}
+		}
+		else { //if mark is false, reveal the space. 
+			reveal[a][b] = 0;
+			uboard[a][b] = reveal[a][b];
+			//revealBoard(row, col, uboard, reveal);
+		}
+	update_field(uboard);
+	return flag, a, b, numMarks, uboard[a][b], reveal[a][b];
 }
 
 
-
-int getInput(bool& mark, char &a, char &b, int& numMarks, int uboard[ROWS][COLS]) {
+int getInput(bool& mark, char &a, char &b, int numMarks, int uboard[ROWS][COLS]) {
+	cout << setw(65);
+	cout << "Marks: " << numMarks << endl;
+	cout << setw(85);
 	cout << "Enter a coordinate (Put M infront to mark): ";
+	string d, e;
 	char c;
 	cin >> c;
-	if (c == 'M') {
-		mark = 1;
-		cin >> a;
+	if (c == 'M' || c == 'm') { //checks if they want to mark
+		mark = true;  //sets mark to true if they want to Mark
+		cin >> d;
 	}
 	else {
 		cin.putback(c);
-		cin >> a;
+		cin.clear();
+		cin >> d;
 	}
+	while (d.length() != 2) {   //if string has more or less than one char it will do the loop. 
+		update_field(uboard);
+		cout << setw(69) << "Invalid Input." << endl;
+		cin.clear();
+		cout << setw(65);
+		cout << "Marks: " << numMarks << endl;
+		cout << setw(85);
+		cout << "Enter a coordinate (Put M infront to mark): ";
+		cin >> d;
+	}
+	a = d[0];
+	b = d[1];
 	if ((char)a >= 97 && (char)a <= 106) {
-		a = a - 32;
+		a = d[0] - 32;
 	}
 	while (!isalpha(a) || (char)a < 65 || (char)a > 75) {
-		cout << setw(72) << "Invalid input. Please Enter a letter: ";
-		cin >> a;
+		cout << setw(72) << "Invalid input." << endl;
+		update_field(uboard);
+		getInput(mark, a, b, numMarks, uboard);
 	}
-	cin >> b;
-	while (!isdigit(b)) {
-		cout << setw(72) << "Invalid input. Please Enter a number: ";
-		cin >> b;
+	while (!isdigit(b) || b >  57 || b < 48 ) {
+		if (e.length() != 1) {
+			cout << setw(80) << "Invalid input. Enter something else  ";
+			cin >> e;
+		}
+		else {
+			cout << setw(80) << "Invalid input. Please enter a number: ";
+			cin >> e;
+		}
+		b = e[0];
 	}
 	a = a - 65;
 	b = b - 48;
-	return mark, a, b;
+	return mark, a, b, numMarks;
 }
 
 void replayGame() {
 	cout << "Would you like to play again? Press y/n" << endl;
-	char a;
-	cin >> a;
-	switch (a) {
-	case 'y':
-		mineSweeper();
-		break;
-	case 'n':
-		exit(1);
-	default:
+	string input;
+	cin >> input;
+	if (input.length() == 1) {
+		char a = input[0];
+		switch (a) {
+		case 'y':
+			mineSweeper();
+			break;
+		case 'n':
+			exit(1);
+		default:
+			cout << "Invalid answer." << endl;
+			replayGame();
+		}
+	}
+	else {
 		cout << "Invalid answer." << endl;
 		replayGame();
 	}
