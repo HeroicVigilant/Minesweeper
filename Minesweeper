@@ -20,6 +20,7 @@ int getInput(bool& flag, char& a, char& b, int numMarks, int uboard[ROWS][COLS])
 int firstMove(bool& flag, char& a, char& b, int numMarks, int uboard[ROWS][COLS], int reveal[ROWS][COLS]);
 int placeMines(int reveal[ROWS][COLS]);
 
+
 int main()
 {
 	theIntro();
@@ -43,11 +44,22 @@ void mineSweeper() {
 	update_field(uboard); //beginning field
 	placeMines(reveal);
 	firstMove(firstMark, firsta, firstb, numMarks, uboard, reveal);
+	//int moveIndex = 0;
 	while (gameOver != 9) {
 		char row = 0, col = 0;
 		bool mark = 0;
 		int victory = 0, d = 0;
 		getInput(mark, row, col, numMarks, uboard);
+	/*	if (moveIndex == 0)
+		{
+			int x = row;
+			int y = col;
+			if (isMine(x, y, reveal) = true)
+				replaceMine(x, y, reveal);
+
+				
+		}*/
+
 		if (mark == true) {     //If mark returns true, go through the marking process. 
 			if (uboard[row][col] != 120 && uboard[row][col] != 77) {
 				mark = false;
@@ -137,6 +149,33 @@ int placeMines(int reveal[ROWS][COLS]) {
 	}
 	return reveal[ROWS][COLS];
 }
+
+/*
+void replaceMine(int row, int col, int board[ROWS][COLS])
+{
+	for (int i = 0; i < ROWS; i++)
+	{
+		for (int j = 0; j < ROWS; j++)
+		{
+			if (board[i][j] != ':(')
+			{
+				board[i][j] = ':(';
+				board[row][col] = 'X';
+				return;
+			}
+		}
+	}
+}*/
+
+/*bool isMine(int row, int col, int reveal[ROWS][COLS])
+{
+	if (reveal[row][col] == ':(')
+	{
+		return (true);
+	}
+	else
+		return (false);
+}*/
 
 char update_field(int uboard[ROWS][COLS]) {
 	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -361,7 +400,7 @@ int firstMove(bool& flag, char& a, char& b, int numMarks, int uboard[ROWS][COLS]
 			reveal[a][b] = 0;
 			uboard[a][b] = reveal[a][b];
 			revealBoard(a, b, uboard, reveal);
-			
+
 		}
 
 		update_field(uboard);
@@ -371,6 +410,10 @@ int firstMove(bool& flag, char& a, char& b, int numMarks, int uboard[ROWS][COLS]
 
 
 int getInput(bool& mark, char &a, char &b, int numMarks, int uboard[ROWS][COLS]) {
+	cout << setw(76);
+	cout << "To reset the board type 'r'\n";
+	cout << setw(75);
+	cout << "To quit the round type 'q'\n";
 	cout << setw(65);
 	cout << "Marks: " << numMarks << endl;
 	cout << setw(85);
@@ -378,9 +421,20 @@ int getInput(bool& mark, char &a, char &b, int numMarks, int uboard[ROWS][COLS])
 	string d, e;
 	char c;
 	cin >> c;
+
 	if (c == 'M' || c == 'm') { //checks if they want to mark
 		mark = true;  //sets mark to true if they want to Mark
 		cin >> d;
+	}
+	else if (c == 'R' || c == 'r')
+	{
+		system("CLS");
+		mineSweeper();
+	}
+	else if (c == 'Q' || c == 'q')
+	{
+		system("pause");
+		exit(1);
 	}
 	else {
 		cin.putback(c);
@@ -391,17 +445,33 @@ int getInput(bool& mark, char &a, char &b, int numMarks, int uboard[ROWS][COLS])
 		update_field(uboard);
 		cout << setw(69) << "Invalid Input." << endl;
 		cin.clear();
+		cout << setw(76);
+		cout << "To reset the board type 'r'\n";
+		cout << setw(75);
+		cout << "To quit the round type 'q'\n";
 		cout << setw(65);
 		cout << "Marks: " << numMarks << endl;
 		cout << setw(85);
 		cout << "Enter a coordinate (Put M infront to mark): ";
-		if (mark = true) {
+		/*if (mark = true) {
 			cout << "M";
+		}*/
+		cin >> c;
+	
+		if (c == 'R' || c == 'r')
+		{
+			system("CLS");
+			mineSweeper();
 		}
-		cin >> d;
+		else if (c == 'Q' || c == 'q')
+		{
+			system("pause");
+			exit(1);
+		}
 	}
 	a = d[0];
 	b = d[1];
+	
 	if ((char)a >= 97 && (char)a <= 106) {
 		a = d[0] - 32;
 	}
